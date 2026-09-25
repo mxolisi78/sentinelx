@@ -44,6 +44,8 @@ urlpatterns = [
     # Accounts (users + /auth/me/)
     path("api/", include("accounts.urls")),
 
+     path("api/", include("detection.urls")),
+
     # Domain APIs
     path("api/", include("events.urls")),
 ]
