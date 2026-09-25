@@ -17,7 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
-
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+    TokenVerifyView,
+)
+from accounts.views import SentinelXLoginView
 
 def home(request):
     return JsonResponse({
@@ -31,5 +35,15 @@ def home(request):
 urlpatterns = [
     path("", home, name="home"),
     path("admin/", admin.site.urls),
+
+    # Auth
+    path("api/auth/login/", SentinelXLoginView.as_view(), name="token_obtain_pair"),
+    path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/auth/verify/", TokenVerifyView.as_view(), name="token_verify"),
+
+    # Accounts (users + /auth/me/)
+    path("api/", include("accounts.urls")),
+
+    # Domain APIs
     path("api/", include("events.urls")),
 ]
