@@ -15,8 +15,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.http import JsonResponse
+from django.urls import include, path
+
+
+def home(request):
+    return JsonResponse({
+        "name": "SentinelX Cyber Defense Platform",
+        "status": "online",
+        "version": "0.1.0",
+        "message": "SentinelX API is running."
+    })
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("", home, name="home"),
+    path("admin/", admin.site.urls),
+    path("api/", include("events.urls")),
 ]
