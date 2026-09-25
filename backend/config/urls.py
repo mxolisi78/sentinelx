@@ -17,11 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-    TokenVerifyView,
-)
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
+
 from accounts.views import SentinelXLoginView
+
 
 def home(request):
     return JsonResponse({
@@ -41,11 +40,9 @@ urlpatterns = [
     path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/auth/verify/", TokenVerifyView.as_view(), name="token_verify"),
 
-    # Accounts (users + /auth/me/)
-    path("api/", include("accounts.urls")),
-
-     path("api/", include("detection.urls")),
-
     # Domain APIs
+    path("api/", include("accounts.urls")),
+    path("api/", include("incidents.urls")),
+    path("api/", include("detection.urls")),   # before events — /events/analyze/
     path("api/", include("events.urls")),
 ]

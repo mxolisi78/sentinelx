@@ -58,6 +58,7 @@ class DetectionEngine:
                 try:
                     findings = rule.evaluate(event)
                 except Exception as exc:
+                    # A broken rule must never kill the whole scan
                     print(f"[engine] Rule {rule.name} failed on event #{event.id}: {exc}")
                     continue
 
@@ -96,6 +97,7 @@ class DetectionEngine:
         ).first()
 
         if existing is None:
+            # First time this rule fires on this event — apply risk bump
             event.risk_score = min(
                 100, (event.risk_score or 0) + (finding.risk_bump or 0)
             )
@@ -111,6 +113,7 @@ class DetectionEngine:
             )
             return True, bool(finding.risk_bump or finding.mark_anomaly)
 
+        # Rule already fired on this event — update metadata only
         changed = (
             existing.confidence != finding.confidence
             or existing.reason != finding.reason
@@ -136,7 +139,7 @@ def run_detection(queryset=None) -> EngineReport:
     report = engine.run(list(queryset))
 
     # Auto-promote high-confidence detections to incidents.
-    # Late import to avoid a circular dependency at module load.
+    # Wrapped in a late import to avoid a circular import at module load.
     from incidents.factory import create_incidents_from_detections
 
     report.incidents_created = create_incidents_from_detections()

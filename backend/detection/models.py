@@ -49,6 +49,12 @@ class Detection(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["event", "rule_name"],
+                name="unique_detection_per_event_rule",
+            ),
+        ]
         indexes = [
             models.Index(fields=["rule_name"]),
             models.Index(fields=["-created_at"]),

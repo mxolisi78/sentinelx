@@ -28,7 +28,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Detection run complete."))
         self.stdout.write(f"  Events scanned     : {report.events_scanned}")
         self.stdout.write(f"  Detections created : {report.detections_created}")
+        self.stdout.write(f"  Detections updated : {report.detections_updated}")
         self.stdout.write(f"  Events escalated   : {report.events_escalated}")
+        self.stdout.write(f"  Incidents created  : {report.incidents_created}")
         self.stdout.write(f"  Duration           : {report.duration_ms} ms")
         if report.by_rule:
             self.stdout.write("  By rule:")

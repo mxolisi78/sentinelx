@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 
@@ -101,6 +102,12 @@ export default function Dashboard() {
             <div style={styles.brandSub}>Security Operations Dashboard</div>
           </div>
         </div>
+        <nav style={styles.nav}>
+          <Link to="/dashboard" style={{ ...styles.navLink, ...styles.navActive }}>
+            Dashboard
+          </Link>
+          <Link to="/incidents" style={styles.navLink}>Incidents</Link>
+        </nav>
         <div style={styles.userBox}>
           <div style={styles.userInfo}>
             <div style={styles.username}>{user?.username}</div>
@@ -113,20 +120,14 @@ export default function Dashboard() {
       </header>
 
       <main style={styles.main}>
-        {/* Summary cards */}
         <section style={styles.cards}>
           <SummaryCard label="Total Events" value={summary.total} accent="#38bdf8" />
           <SummaryCard label="High / Critical" value={summary.high} accent="#f97316" />
           <SummaryCard label="Anomalies" value={summary.anomalies} accent="#ef4444" />
           <SummaryCard label="Avg Risk" value={summary.avgRisk} accent="#a855f7" />
-          <SummaryCard
-            label="Detections"
-            value={summary.detections}
-            accent="#22c55e"
-          />
+          <SummaryCard label="Detections" value={summary.detections} accent="#22c55e" />
         </section>
 
-        {/* Detection controls */}
         {canAnalyze && (
           <section style={styles.controls}>
             <button
@@ -171,7 +172,6 @@ export default function Dashboard() {
           </section>
         )}
 
-        {/* Tabs */}
         <section style={styles.panel}>
           <div style={styles.panelHeader}>
             <div style={styles.tabs}>
@@ -208,8 +208,6 @@ export default function Dashboard() {
     </div>
   );
 }
-
-/* ------------------------------ Sub-components ------------------------ */
 
 function SummaryCard({ label, value, accent }) {
   return (
@@ -413,16 +411,12 @@ function formatTime(iso) {
   return new Date(iso).toLocaleString();
 }
 
-/* ------------------------------- Styles ------------------------------- */
-
 const styles = {
   page: {
     minHeight: "100vh",
-    background:
-      "radial-gradient(circle at 20% 0%, #0b1220 0%, #020617 55%, #000 100%)",
+    background: "radial-gradient(circle at 20% 0%, #0b1220 0%, #020617 55%, #000 100%)",
     color: "#e2e8f0",
-    fontFamily:
-      "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
   },
   header: {
     display: "flex",
@@ -439,12 +433,17 @@ const styles = {
   brand: { display: "flex", alignItems: "center", gap: "0.75rem" },
   logo: { fontSize: "1.75rem" },
   brandName: { fontWeight: 700, letterSpacing: "0.05em", color: "#38bdf8" },
-  brandSub: {
-    fontSize: "0.7rem",
-    letterSpacing: "0.15em",
-    textTransform: "uppercase",
-    color: "#64748b",
+  brandSub: { fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#64748b" },
+  nav: { display: "flex", gap: "0.5rem" },
+  navLink: {
+    color: "#94a3b8",
+    textDecoration: "none",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    padding: "0.4rem 0.8rem",
+    borderRadius: "6px",
   },
+  navActive: { color: "#38bdf8", background: "rgba(56, 189, 248, 0.1)" },
   userBox: { display: "flex", alignItems: "center", gap: "1rem" },
   userInfo: { textAlign: "right" },
   username: { fontSize: "0.85rem", fontWeight: 600 },
@@ -569,7 +568,6 @@ const styles = {
     borderRadius: "999px",
     padding: "0.05rem 0.45rem",
   },
-  panelTitle: { margin: 0, fontSize: "1.05rem", color: "#e2e8f0" },
   panelMeta: { fontSize: "0.8rem", color: "#64748b" },
   tableWrap: { overflowX: "auto" },
   table: { width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" },
