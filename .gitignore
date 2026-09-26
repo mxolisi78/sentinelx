@@ -55,3 +55,6 @@ backend/ml/models/*.pkl
 # ML trained artifacts
 backend/ml/artifacts/*.joblib
 backend/ml/artifacts/*.pkl
+
+# Stray detection folder at repo root (should never exist)
+/detection/
