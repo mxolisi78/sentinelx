@@ -4,7 +4,7 @@ A lightweight Security Operations Center (SOC) platform for ingesting
 security events, running detection rules against them, and managing
 incidents end-to-end.
 
-![CI](https://github.com/YOUR-USERNAME/sentinelx/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/mxolisi78/sentinelx/actions/workflows/ci.yml/badge.svg)
 
 ## Features
 
