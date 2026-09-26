@@ -1,5 +1,12 @@
 """
 SentinelX detection engine.
+
+Runs every registered rule against each event, upserts Detection rows,
+updates the event's rule-based risk score and anomaly flag, and after
+the scan promotes high-confidence detections into Incidents.
+
+Also refreshes each event's combined_risk_score, which blends the
+rule-based score with the ML anomaly score.
 """
 
 from dataclasses import dataclass, field
@@ -72,7 +79,7 @@ class DetectionEngine:
                 event.save(update_fields=["risk_score", "is_anomaly", "updated_at"])
                 report.events_escalated += 1
 
-        # Refresh combined risk on every scanned event
+        # Refresh combined risk for every event scanned
         self._refresh_combined_risk(events_list)
 
         report.duration_ms = int((timezone.now() - started).total_seconds() * 1000)
@@ -80,6 +87,12 @@ class DetectionEngine:
 
     @transaction.atomic
     def _persist_finding(self, event: SecurityEvent, finding):
+        """
+        Upsert a Detection for this (event, rule_name) pair.
+
+        Returns (created: bool, risk_bumped: bool). The risk bump is only
+        applied the first time a rule fires on an event.
+        """
         existing = Detection.objects.filter(
             event=event, rule_name=finding.rule_name
         ).first()
@@ -113,34 +126,21 @@ class DetectionEngine:
         return False, False
 
     def _refresh_combined_risk(self, events):
+        """Recompute combined_risk_score = max(rule, blend(rule, ML))."""
         from ml.models import AnomalyScore
-
-        updated = 0
         for event in events:
             try:
                 ml = event.anomaly_score.normalized_score
             except AnomalyScore.DoesNotExist:
                 ml = 0
-
             rule = event.risk_score or 0
-            # Blend: ML contributes 80%, rule contributes 20%, but rule
-            # alone is a floor (so a strong rule hit is never diluted).
-            blended = int(ml * 0.8 + rule * 0.2)
-            combined = min(100, max(rule, blended))
-
-            # Store ML score on event too
-            new_ml = ml
-
-            if (combined != (event.combined_risk_score or 0)) or (new_ml != (event.ml_score or 0)):
+            combined = min(100, max(rule, int(ml * 0.8 + rule * 0.2)))
+            if combined != event.combined_risk_score:
                 event.combined_risk_score = combined
-                event.ml_score = new_ml
-                event.save(update_fields=["combined_risk_score", "ml_score", "updated_at"])
-                updated += 1
-
-        if updated:
-            print(f"[engine] Refreshed combined risk on {updated} events.")
+                event.save(update_fields=["combined_risk_score", "updated_at"])
 
     def _broadcast_detection(self, det):
+        """Publish a new detection to all connected dashboards."""
         try:
             from asgiref.sync import async_to_sync
             from channels.layers import get_channel_layer
@@ -170,12 +170,18 @@ class DetectionEngine:
 
 
 def run_detection(queryset=None) -> EngineReport:
+    """
+    Convenience function. Defaults to scanning all events with no
+    existing detections. After the scan, promotes high-confidence
+    detections into Incidents.
+    """
     if queryset is None:
         queryset = SecurityEvent.objects.filter(detections__isnull=True).distinct()
 
     engine = DetectionEngine()
     report = engine.run(list(queryset))
 
+    # Auto-promote high-confidence detections to incidents
     from incidents.factory import create_incidents_from_detections
     report.incidents_created = create_incidents_from_detections()
 

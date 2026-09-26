@@ -64,6 +64,13 @@ def score_events(request):
                 "is_anomaly": is_anomaly,
             },
         )
+        # Mirror onto the event, refresh combined risk
+        event.ml_score = normalized
+        rule = event.risk_score or 0
+        event.combined_risk_score = min(
+            100, max(rule, int(normalized * 0.8 + rule * 0.2))
+        )
+        event.save(update_fields=["ml_score", "combined_risk_score", "updated_at"])
         if is_anomaly:
             anomalies += 1
 

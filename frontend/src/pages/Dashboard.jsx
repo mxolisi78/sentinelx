@@ -270,7 +270,7 @@ function EventsTable({ events, loading }) {
             <Th>Source IP</Th>
             <Th>User</Th>
             <Th>Device</Th>
-            <Th>Risk</Th>
+            <Th>Combined Risk</Th>
             <Th>Anomaly</Th>
             <Th>Time</Th>
           </tr>
@@ -283,7 +283,7 @@ function EventsTable({ events, loading }) {
               <Td mono>{e.source_ip || "—"}</Td>
               <Td>{e.username || "—"}</Td>
               <Td>{e.device || "—"}</Td>
-              <Td><RiskMeter score={e.risk_score} /></Td>
+              <Td><RiskMeter score={e.combined_risk_score ?? e.risk_score} /></Td>
               <Td>
                 {e.is_anomaly ? (
                   <span style={styles.anomaly}>⚠ Yes</span>

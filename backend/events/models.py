@@ -78,5 +78,15 @@ class SecurityEvent(models.Model):
         auto_now=True
     )
 
+    ml_score = models.IntegerField(
+        default=0,
+        help_text="ML anomaly score, mirrored from AnomalyScore.normalized_score.",
+    )
+
+    combined_risk_score = models.IntegerField(
+        default=0,
+        help_text="Unified risk: max of rule-based and ML signals.",
+    )
+
     def __str__(self):
         return f"{self.event_type} - {self.severity} - {self.timestamp}"
