@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "incidents",
     "detection",
     "ml",
+    "threatintel",
 ]
 
 

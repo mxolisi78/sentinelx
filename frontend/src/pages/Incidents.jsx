@@ -121,11 +121,12 @@ export default function Incidents() {
           </div>
         </div>
         <nav style={styles.nav}>
-          <Link to="/dashboard" style={styles.navLink}>Dashboard</Link>
-          <Link to="/incidents" style={{ ...styles.navLink, ...styles.navActive }}>
-            Incidents
-          </Link>
-        </nav>
+  <Link to="/dashboard" style={styles.navLink}>Dashboard</Link>
+  <Link to="/incidents" style={{ ...styles.navLink, ...styles.navActive }}>
+    Incidents
+  </Link>
+  <Link to="/threat-intel" style={styles.navLink}>Threat Intel</Link>
+</nav>
         <div style={styles.userBox}>
           <div style={styles.userInfo}>
             <div style={styles.username}>{user?.username}</div>

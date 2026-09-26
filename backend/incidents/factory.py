@@ -38,6 +38,8 @@ def _build_title(detection: Detection) -> str:
 
 
 def _build_description(detection: Detection) -> str:
+    from threatintel.services import summary_for_ip
+
     event = detection.event
     lines = [
         f"Rule: {detection.get_rule_name_display()}",
@@ -51,9 +53,24 @@ def _build_description(detection: Detection) -> str:
         f"Device: {event.device or 'unknown'}",
         f"Location: {event.location or 'unknown'}",
         f"Risk score: {event.risk_score}",
-        "",
-        f"Message: {event.message}",
     ]
+
+    # Attach threat intel if available for the source IP
+    if event.source_ip:
+        intel = summary_for_ip(event.source_ip)
+        if intel.get("known"):
+            lines.extend([
+                "",
+                "── Threat Intelligence ──",
+                f"Category:     {intel['category']}",
+                f"Abuse score:  {intel['abuse_score']} / 100",
+                f"Reports:      {intel['report_count']}",
+                f"Country:      {intel['country'] or '—'}",
+                f"ASN:          {intel['asn'] or '—'} ({intel['asn_owner'] or '—'})",
+                f"Risk level:   {intel['risk_level']}",
+            ])
+
+    lines.extend(["", f"Message: {event.message}"])
     return "\n".join(lines)
 
 

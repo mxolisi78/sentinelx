@@ -27,7 +27,8 @@ urlpatterns = [
     # Domain APIs
     path("api/", include("accounts.urls")),
     path("api/", include("incidents.urls")),
-    path("api/", include("detection.urls")),  # before events ? /events/analyze/
+    path("api/", include("detection.urls")),  # before events
     path("api/", include("ml.urls")),
+    path("api/", include("threatintel.urls")),
     path("api/", include("events.urls")),
 ]

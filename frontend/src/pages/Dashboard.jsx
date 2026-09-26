@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/ToastHost";
 import { useActivitySocket } from "../api/socket";
 import client from "../api/client";
+import ThreatBadge from "../components/ThreatBadge";
 
 const SEVERITY_COLORS = {
   LOW: { bg: "rgba(34, 197, 94, 0.15)", fg: "#4ade80", border: "#22c55e" },
@@ -139,11 +140,12 @@ export default function Dashboard() {
           </div>
         </div>
         <nav style={styles.nav}>
-          <Link to="/dashboard" style={{ ...styles.navLink, ...styles.navActive }}>
-            Dashboard
-          </Link>
-          <Link to="/incidents" style={styles.navLink}>Incidents</Link>
-        </nav>
+  <Link to="/dashboard" style={{ ...styles.navLink, ...styles.navActive }}>
+    Dashboard
+  </Link>
+  <Link to="/incidents" style={styles.navLink}>Incidents</Link>
+  <Link to="/threat-intel" style={styles.navLink}>Threat Intel</Link>
+</nav>
         <div style={styles.userBox}>
           <div style={styles.userInfo}>
             <div style={styles.username}>{user?.username}</div>
@@ -280,7 +282,10 @@ function EventsTable({ events, loading }) {
             <tr key={e.id} style={styles.row}>
               <Td><span style={styles.typeText}>{e.event_type}</span></Td>
               <Td><SeverityBadge severity={e.severity} /></Td>
-              <Td mono>{e.source_ip || "—"}</Td>
+              <Td mono>
+  {e.source_ip || "—"}
+  <ThreatBadge reputation={e.source_ip_reputation} compact />
+</Td>
               <Td>{e.username || "—"}</Td>
               <Td>{e.device || "—"}</Td>
               <Td><RiskMeter score={e.combined_risk_score ?? e.risk_score} /></Td>
