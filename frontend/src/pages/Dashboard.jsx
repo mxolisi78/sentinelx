@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../components/ToastHost";
+import { useActivitySocket } from "../api/socket";
 import client from "../api/client";
 
 const SEVERITY_COLORS = {
@@ -35,6 +37,7 @@ export default function Dashboard() {
   const [lastReport, setLastReport] = useState(null);
 
   const canAnalyze = user?.role === "ADMIN" || user?.role === "ANALYST";
+    const [liveIncidents, setLiveIncidents] = useState([]);
 
   async function loadData() {
     setLoading(true);
@@ -51,6 +54,39 @@ export default function Dashboard() {
       setLoading(false);
     }
   }
+
+    const { push: pushToast } = useToast();
+
+  useActivitySocket((msg) => {
+    if (!msg || !msg.event) return;
+
+    if (msg.event === "detection.created") {
+      const d = msg.detection;
+      setDetections((list) => [d, ...list]);
+
+      if (d.event_severity === "CRITICAL") {
+        pushToast({
+          title: `Detection: ${d.rule_name}`,
+          body: d.reason,
+          severity: "CRITICAL",
+        });
+      }
+    } else if (msg.event === "incident.created") {
+      const i = msg.incident;
+      setLiveIncidents((list) => [i, ...list]);
+
+      if (i.severity === "CRITICAL" || i.severity === "HIGH") {
+        pushToast({
+          title: `${i.severity} incident created`,
+          body: i.title,
+          severity: i.severity,
+          onClick: () => {
+            window.location.href = "/incidents";
+          },
+        });
+      }
+    }
+  });
 
   useEffect(() => {
     loadData();
@@ -126,6 +162,11 @@ export default function Dashboard() {
           <SummaryCard label="Anomalies" value={summary.anomalies} accent="#ef4444" />
           <SummaryCard label="Avg Risk" value={summary.avgRisk} accent="#a855f7" />
           <SummaryCard label="Detections" value={summary.detections} accent="#22c55e" />
+          <SummaryCard
+            label="Live Incidents"
+            value={liveIncidents.length}
+            accent="#f472b6"
+          />
         </section>
 
         {canAnalyze && (

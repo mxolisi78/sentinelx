@@ -132,7 +132,7 @@ class DetectionEngine:
         try:
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
-                "sentinelx_detections",
+                "sentinelx_activity",
                 {
                     "type": "feed.message",
                     "payload": {
@@ -152,7 +152,7 @@ class DetectionEngine:
             )
         except Exception as exc:
             print(f"[broadcast] Detection {det.id} broadcast failed: {exc}")
-            
+
 def run_detection(queryset=None) -> EngineReport:
     """
     Convenience function. Defaults to scanning all events with no

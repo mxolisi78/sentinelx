@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../components/ToastHost";
+import { useActivitySocket } from "../api/socket";
 import client from "../api/client";
 
 const STATUS_COLORS = {
@@ -31,6 +33,28 @@ export default function Incidents() {
   const [filterSeverity, setFilterSeverity] = useState("");
 
   const canModify = user?.role === "ADMIN" || user?.role === "ANALYST";
+
+    const { push: pushToast } = useToast();
+
+  useActivitySocket((msg) => {
+    if (!msg || msg.event !== "incident.created") return;
+
+    const inc = msg.incident;
+
+    // Prepend only if not already present
+    setIncidents((list) => {
+      if (list.some((i) => i.id === inc.id)) return list;
+      return [{ ...inc, event_count: 0, detection_count: 0 }, ...list];
+    });
+
+    if (inc.severity === "CRITICAL" || inc.severity === "HIGH") {
+      pushToast({
+        title: `${inc.severity} incident created`,
+        body: inc.title,
+        severity: inc.severity,
+      });
+    }
+  });
 
   async function loadIncidents() {
     setLoading(true);

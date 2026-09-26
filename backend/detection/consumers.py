@@ -1,48 +1,68 @@
 """
 WebSocket consumers for real-time SentinelX updates.
 
-Each authenticated user joins a broadcast group. When the backend
-creates an incident or detection, it publishes to that group, and every
-connected client receives the payload immediately.
+All activity flows through the sentinelx_activity group so the frontend
+needs only one connection per tab. The message payload's "event" field
+discriminates the update type.
 """
 
 import json
+import logging
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 
-class BaseFeedConsumer(AsyncWebsocketConsumer):
-    group_name = "sentinelx_feed"
+logger = logging.getLogger(__name__)
+ACTIVITY_GROUP = "sentinelx_activity"
+
+
+class ActivityFeedConsumer(AsyncWebsocketConsumer):
+    group_name = ACTIVITY_GROUP
 
     async def connect(self):
         user = self.scope.get("user")
-        if not user or not user.is_authenticated:
+        if user is None or not getattr(user, "is_authenticated", False):
+            # Reject cleanly. Daphne is happy with this at the consumer level.
             await self.close(code=4001)
             return
 
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
-        await self.send(
-            text_data=json.dumps(
-                {
-                    "type": "connected",
-                    "group": self.group_name,
-                    "user": user.username,
-                }
+
+        # Be defensive: role may or may not exist depending on user type
+        role = getattr(user, "role", None)
+        username = getattr(user, "username", None)
+
+        try:
+            await self.send(
+                text_data=json.dumps(
+                    {
+                        "event": "connected",
+                        "group": self.group_name,
+                        "user": username,
+                        "role": role,
+                    }
+                )
             )
-        )
+        except Exception as exc:
+            logger.exception("Failed to send connected message: %s", exc)
 
     async def disconnect(self, code):
-        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        try:
+            await self.channel_layer.group_discard(
+                self.group_name, self.channel_name
+            )
+        except Exception:
+            pass
 
     async def feed_message(self, event):
-        """Handler called when group_send fires with type=feed.message."""
         await self.send(text_data=json.dumps(event["payload"]))
 
 
-class IncidentFeedConsumer(BaseFeedConsumer):
-    group_name = "sentinelx_incidents"
+# Legacy aliases ? same consumer, same group.
+class IncidentFeedConsumer(ActivityFeedConsumer):
+    pass
 
 
-class DetectionFeedConsumer(BaseFeedConsumer):
-    group_name = "sentinelx_detections"
+class DetectionFeedConsumer(ActivityFeedConsumer):
+    pass

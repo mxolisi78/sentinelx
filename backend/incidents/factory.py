@@ -119,7 +119,7 @@ def _broadcast_incident(incident):
     try:
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
-            "sentinelx_incidents",
+            "sentinelx_activity",
             {
                 "type": "feed.message",
                 "payload": {

@@ -1,10 +1,12 @@
 """
 WebSocket JWT authentication middleware.
 
-Clients connect to /ws/... with a JWT in the query string, e.g.
-    ws://localhost:8000/ws/incidents/?token=eyJ...
-The middleware validates the token and attaches the User to the scope.
-Unauthenticated connections are closed immediately.
+Clients connect with a JWT in the query string:
+    ws://localhost:8000/ws/activity/?token=eyJ...
+The middleware validates the token and attaches the User (or
+AnonymousUser) to the scope. The consumer is responsible for rejecting
+anonymous connections ? the middleware never tries to close the socket
+itself, because doing so before handshake can crash Daphne.
 """
 
 from urllib.parse import parse_qs
@@ -40,15 +42,8 @@ class JwtAuthMiddleware(BaseMiddleware):
         else:
             scope["user"] = AnonymousUser()
 
-        # Reject anonymous users
-        if not scope["user"].is_authenticated:
-            # Close the socket cleanly
-            await send({"type": "websocket.close", "code": 4001})
-            return
-
         return await super().__call__(scope, receive, send)
 
 
 def JwtAuthMiddlewareStack(inner):
-    """Compose JWT auth with cookie/session middleware."""
     return CookieMiddleware(SessionMiddleware(JwtAuthMiddleware(inner)))
