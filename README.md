@@ -4,6 +4,8 @@ A lightweight Security Operations Center (SOC) platform for ingesting
 security events, running detection rules against them, and managing
 incidents end-to-end.
 
+![CI](https://github.com/YOUR-USERNAME/sentinelx/actions/workflows/ci.yml/badge.svg)
+
 ## Features
 
 - **JWT authentication** with three roles (Admin / Analyst / Viewer)
