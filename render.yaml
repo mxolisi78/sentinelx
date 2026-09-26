@@ -5,7 +5,7 @@ services:
   - type: web
     name: sentinelx-backend
     runtime: python
-    plan: hobby
+    plan: free
     rootDir: backend
     buildCommand: "./build.sh"
     startCommand: "daphne -p $PORT -b 0.0.0.0 config.asgi:application"
@@ -31,12 +31,11 @@ services:
         value: "true"
 
   # ------------------------------------------------------------------
-  # Frontend ? React static site
+  # Frontend ? React static site (no plan field ? static sites are always free)
   # ------------------------------------------------------------------
   - type: web
     name: sentinelx-frontend
     runtime: static
-    plan: hobby
     rootDir: frontend
     buildCommand: "npm ci && npm run build"
     staticPublishPath: "./dist"
@@ -51,5 +50,5 @@ services:
 databases:
   - name: sentinelx-db
     databaseName: sentinelx
-    plan: hobby
+    plan: free
     ipAllowList: []
