@@ -39,3 +39,11 @@ htmlcov/
 # ML
 ml/models/*.pkl
 ml/models/*.joblib
+# Coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# pytest
+.pytest_cache/
