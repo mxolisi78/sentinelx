@@ -1,0 +1,55 @@
+services:
+  # ------------------------------------------------------------------
+  # Backend ? Django web service (ASGI with Daphne for WebSockets)
+  # ------------------------------------------------------------------
+  - type: web
+    name: sentinelx-backend
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: "./build.sh"
+    startCommand: "daphne -p $PORT -b 0.0.0.0 config.asgi:application"
+    healthCheckPath: /
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sentinelx-db
+          property: connectionString
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false   # Set in Render dashboard after frontend deploys
+      - key: SECURE_SSL_REDIRECT
+        value: "true"
+      - key: BEHIND_PROXY
+        value: "true"
+
+  # ------------------------------------------------------------------
+  # Frontend ? React static site
+  # ------------------------------------------------------------------
+  - type: web
+    name: sentinelx-frontend
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: "npm ci && npm run build"
+    staticPublishPath: "./dist"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false   # Set in Render dashboard after backend deploys
+
+databases:
+  - name: sentinelx-db
+    databaseName: sentinelx
+    plan: free
+    ipAllowList: []  # Only allow connections from Render services
