@@ -47,3 +47,11 @@ htmlcov/
 
 # pytest
 .pytest_cache/
+
+# ML trained artifacts
+backend/ml/models/*.joblib
+backend/ml/models/*.pkl
+
+# ML trained artifacts
+backend/ml/artifacts/*.joblib
+backend/ml/artifacts/*.pkl

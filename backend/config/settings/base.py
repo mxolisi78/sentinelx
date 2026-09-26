@@ -53,10 +53,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
 
+        # SentinelX
     "accounts",
     "events",
     "incidents",
     "detection",
+    "ml",
 ]
 
 
