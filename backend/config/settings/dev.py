@@ -24,3 +24,12 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 INTERNAL_IPS = ["127.0.0.1"]
+
+# In-memory channel layer for local development.
+# No Redis required. Do NOT use this in production (messages only reach
+# consumers running in the same process).
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}

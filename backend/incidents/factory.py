@@ -14,9 +14,12 @@ from events.models import SecurityEvent
 
 from .models import Incident
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 
 # Detections at or above this confidence spawn an incident.
-INCIDENT_CONFIDENCE_THRESHOLD = 70
+INCIDENT_CONFIDENCE_THRESHOLD = 60
 
 # Maps rule_name -> incident severity. Lets us tune per-rule urgency.
 RULE_SEVERITY = {
@@ -89,6 +92,13 @@ def create_incidents_from_detections(detections=None) -> int:
         incident.detections.add(det)
         created_count += 1
 
+        incident.events.add(det.event)
+        incident.detections.add(det)
+
+        _broadcast_incident(incident)
+
+        created_count += 1
+
     return created_count
 
 
@@ -103,3 +113,27 @@ def resolve_incident(incident: Incident, notes: str = "") -> Incident:
         update_fields=["status", "resolved_at", "resolution_notes", "updated_at"]
     )
     return incident
+
+def _broadcast_incident(incident):
+    """Publish a newly created incident to all connected dashboards."""
+    try:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "sentinelx_incidents",
+            {
+                "type": "feed.message",
+                "payload": {
+                    "event": "incident.created",
+                    "incident": {
+                        "id": incident.id,
+                        "title": incident.title,
+                        "severity": incident.severity,
+                        "status": incident.status,
+                        "created_at": incident.created_at.isoformat(),
+                    },
+                },
+            },
+        )
+    except Exception as exc:
+        # Never let a broadcast failure break the detection run
+        print(f"[broadcast] Incident {incident.id} broadcast failed: {exc}")

@@ -19,6 +19,9 @@ from events.models import SecurityEvent
 from .models import Detection
 from .rules.registry import discover_rules
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 
 @dataclass
 class EngineReport:
@@ -102,13 +105,14 @@ class DetectionEngine:
             if finding.mark_anomaly:
                 event.is_anomaly = True
 
-            Detection.objects.create(
+                det = Detection.objects.create(
                 event=event,
                 rule_name=finding.rule_name,
                 confidence=finding.confidence,
                 reason=finding.reason,
                 auto_escalated=bool(finding.risk_bump or finding.mark_anomaly),
             )
+            self._broadcast_detection(det)
             return True, bool(finding.risk_bump or finding.mark_anomaly)
 
         changed = (
@@ -123,6 +127,32 @@ class DetectionEngine:
         return False, False
 
 
+    def _broadcast_detection(self, det):
+        """Publish a new detection to all connected dashboards."""
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "sentinelx_detections",
+                {
+                    "type": "feed.message",
+                    "payload": {
+                        "event": "detection.created",
+                        "detection": {
+                            "id": det.id,
+                            "rule_name": det.rule_name,
+                            "confidence": det.confidence,
+                            "reason": det.reason,
+                            "event_id": det.event_id,
+                            "event_type": det.event.event_type,
+                            "event_severity": det.event.severity,
+                            "created_at": det.created_at.isoformat(),
+                        },
+                    },
+                },
+            )
+        except Exception as exc:
+            print(f"[broadcast] Detection {det.id} broadcast failed: {exc}")
+            
 def run_detection(queryset=None) -> EngineReport:
     """
     Convenience function. Defaults to scanning all events with no

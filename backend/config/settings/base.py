@@ -41,6 +41,8 @@ ALLOWED_HOSTS = [
 # ---------------------------------------------------------------------------
 
 INSTALLED_APPS = [
+    "daphne",  # must be first to override the runserver command
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -177,3 +179,9 @@ SIMPLE_JWT = {
 # ---------------------------------------------------------------------------
 
 CORS_ALLOWED_ORIGINS = []
+
+# ---------------------------------------------------------------------------
+# Channels (WebSocket support)
+# ---------------------------------------------------------------------------
+
+ASGI_APPLICATION = "config.asgi.application"
