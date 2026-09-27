@@ -2,6 +2,11 @@ import axios from "axios";
 
 const PRODUCTION_BACKEND = "https://sentinelx-backend-8o58.onrender.com/api";
 
+const isLocalhost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+   window.location.hostname === "127.0.0.1");
+
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL !== undefined &&
   import.meta.env.VITE_API_BASE_URL !== ""
@@ -10,7 +15,7 @@ const BASE_URL =
        window.location.hostname === "127.0.0.1")
       ? "/api"   // local dev: Vite proxies /api to Django
       : PRODUCTION_BACKEND;   // deployed: use the Render backend
-      
+
 const client = axios.create({
   baseURL: BASE_URL,
   headers: {
