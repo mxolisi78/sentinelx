@@ -10,10 +10,6 @@ from .base import *  # noqa
 
 DEBUG = False
 
-# ---------------------------------------------------------------------------
-# Database
-# ---------------------------------------------------------------------------
-
 DATABASES = {
     "default": dj_database_url.parse(
         os.getenv("DATABASE_URL", ""),
@@ -21,32 +17,6 @@ DATABASES = {
         conn_health_checks=True,
     )
 }
-
-# ---------------------------------------------------------------------------
-# Middleware (override base to insert WhiteNoise)
-# ---------------------------------------------------------------------------
-
-MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # ADD THIS
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
-
-# ---------------------------------------------------------------------------
-# Static files
-# ---------------------------------------------------------------------------
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-# ---------------------------------------------------------------------------
-# Security
-# ---------------------------------------------------------------------------
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
@@ -60,10 +30,6 @@ CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
 if os.getenv("BEHIND_PROXY", "false").lower() == "true":
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-# ---------------------------------------------------------------------------
-# CORS
-# ---------------------------------------------------------------------------
-
 CORS_ALLOWED_ORIGINS = [
     o.strip()
     for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
@@ -71,3 +37,12 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+# Redis-backed channel layer for production.
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(os.getenv("REDIS_HOST", "redis"), int(os.getenv("REDIS_PORT", "6379")))],
+        },
+    },
+}
