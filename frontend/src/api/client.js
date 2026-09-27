@@ -7,14 +7,11 @@ const isLocalhost =
   (window.location.hostname === "localhost" ||
    window.location.hostname === "127.0.0.1");
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL !== undefined &&
-  import.meta.env.VITE_API_BASE_URL !== ""
-    ? import.meta.env.VITE_API_BASE_URL
-    : (window.location.hostname === "localhost" ||
-       window.location.hostname === "127.0.0.1")
-      ? "/api"   // local dev: Vite proxies /api to Django
-      : PRODUCTION_BACKEND;   // deployed: use the Render backend
+const BASE_URL = isLocalhost
+  ? "/api"
+  : (import.meta.env.VITE_API_BASE_URL &&
+     import.meta.env.VITE_API_BASE_URL.trim()) ||
+    PRODUCTION_BACKEND;
 
 const client = axios.create({
   baseURL: BASE_URL,
@@ -42,7 +39,6 @@ client.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("sentinelx_access_token");
       localStorage.removeItem("sentinelx_refresh_token");
-      // Redirect to login unless already there
       if (window.location.pathname !== "/login") {
         window.location.href = "/login";
       }
