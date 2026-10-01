@@ -88,6 +88,7 @@ export default function ThreatIntel() {
           <NavLink to="/dashboard">Dashboard</NavLink>
           <NavLink to="/incidents">Incidents</NavLink>
           <NavLink to="/threat-intel" active>Threat Intel</NavLink>
+          <NavLink to="/analytics">Analytics</NavLink>
         </nav>
 
         <div className="flex items-center gap-3">

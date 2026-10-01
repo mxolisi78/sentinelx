@@ -149,6 +149,7 @@ export default function Dashboard() {
           <NavLink to="/dashboard" active>Dashboard</NavLink>
           <NavLink to="/incidents">Incidents</NavLink>
           <NavLink to="/threat-intel">Threat Intel</NavLink>
+          <NavLink to="/analytics">Analytics</NavLink>
         </nav>
 
         <div className="flex items-center gap-3">

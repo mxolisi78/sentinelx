@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Incidents from "./pages/Incidents";
 import ThreatIntel from "./pages/ThreatIntel";
+import Analytics from "./pages/Analytics";
 
 export default function App() {
   return (
@@ -40,6 +41,14 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+  path="/analytics"
+  element={
+    <ProtectedRoute>
+      <Analytics />
+    </ProtectedRoute>
+  }
+/>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>

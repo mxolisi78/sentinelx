@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "detection",
     "ml",
     "threatintel",
+     "analytics",
 ]
 
 

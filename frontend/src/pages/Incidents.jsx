@@ -126,6 +126,7 @@ export default function Incidents() {
           <NavLink to="/dashboard">Dashboard</NavLink>
           <NavLink to="/incidents" active>Incidents</NavLink>
           <NavLink to="/threat-intel">Threat Intel</NavLink>
+          <NavLink to="/analytics">Analytics</NavLink>
         </nav>
 
         <div className="flex items-center gap-3">
