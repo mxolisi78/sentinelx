@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Shield } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -29,143 +30,64 @@ export default function Login() {
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <div style={styles.brand}>
-          <div style={styles.logo}>🛡️</div>
-          <h1 style={styles.title}>SentinelX</h1>
-          <p style={styles.subtitle}>Cyber Defense Platform</p>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-black">
+      <div className="w-full max-w-md bg-slate-900/80 border border-sky-500/25 rounded-2xl p-10 shadow-2xl backdrop-blur-md">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-2">
+            <Shield size={48} className="text-sky-400" strokeWidth={1.5} />
+          </div>
+          <h1 className="text-3xl font-bold tracking-wide text-sky-400">
+            SentinelX
+          </h1>
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-500 mt-1">
+            Cyber Defense Platform
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <label style={styles.label}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label className="flex flex-col gap-1.5 text-sm text-slate-300">
             Username
             <input
-              style={styles.input}
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="username"
               required
+              className="px-3 py-2.5 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition"
             />
           </label>
 
-          <label style={styles.label}>
+          <label className="flex flex-col gap-1.5 text-sm text-slate-300">
             Password
             <input
-              style={styles.input}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
               required
+              className="px-3 py-2.5 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition"
             />
           </label>
 
-          {error && <div style={styles.error}>{error}</div>}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/40 text-red-200 px-3 py-2.5 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
 
-          <button style={styles.button} type="submit" disabled={submitting}>
-            {submitting ? "Signing in…" : "Sign in"}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="mt-2 py-3 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold text-sm tracking-wide hover:from-sky-400 hover:to-blue-500 disabled:opacity-60 disabled:cursor-wait transition"
+          >
+            {submitting ? "Signing in?" : "Sign in"}
           </button>
         </form>
 
-        <p style={styles.footer}>
+        <p className="mt-6 text-center text-xs text-slate-500">
           Authorized personnel only. All access is logged.
         </p>
       </div>
     </div>
   );
 }
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background:
-      "radial-gradient(circle at 20% 20%, #0f172a 0%, #020617 60%, #000 100%)",
-    fontFamily:
-      "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
-    color: "#e2e8f0",
-    padding: "1rem",
-  },
-  card: {
-    width: "100%",
-    maxWidth: "400px",
-    background: "rgba(15, 23, 42, 0.85)",
-    border: "1px solid rgba(56, 189, 248, 0.25)",
-    borderRadius: "16px",
-    padding: "2.5rem",
-    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
-    backdropFilter: "blur(10px)",
-  },
-  brand: {
-    textAlign: "center",
-    marginBottom: "2rem",
-  },
-  logo: {
-    fontSize: "2.5rem",
-    marginBottom: "0.25rem",
-  },
-  title: {
-    margin: 0,
-    fontSize: "1.75rem",
-    letterSpacing: "0.05em",
-    color: "#38bdf8",
-  },
-  subtitle: {
-    margin: "0.25rem 0 0",
-    fontSize: "0.85rem",
-    color: "#94a3b8",
-    letterSpacing: "0.1em",
-    textTransform: "uppercase",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-  },
-  label: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.35rem",
-    fontSize: "0.85rem",
-    color: "#cbd5e1",
-  },
-  input: {
-    padding: "0.65rem 0.75rem",
-    borderRadius: "8px",
-    border: "1px solid #334155",
-    background: "#0b1220",
-    color: "#e2e8f0",
-    fontSize: "0.95rem",
-    outline: "none",
-  },
-  button: {
-    marginTop: "0.5rem",
-    padding: "0.75rem",
-    borderRadius: "8px",
-    border: "none",
-    background: "linear-gradient(135deg, #0ea5e9, #2563eb)",
-    color: "white",
-    fontWeight: 600,
-    fontSize: "0.95rem",
-    cursor: "pointer",
-    letterSpacing: "0.03em",
-  },
-  error: {
-    background: "rgba(239, 68, 68, 0.15)",
-    border: "1px solid rgba(239, 68, 68, 0.4)",
-    color: "#fecaca",
-    padding: "0.6rem 0.75rem",
-    borderRadius: "8px",
-    fontSize: "0.85rem",
-  },
-  footer: {
-    marginTop: "1.5rem",
-    textAlign: "center",
-    fontSize: "0.75rem",
-    color: "#64748b",
-  },
-};

@@ -62,9 +62,20 @@ export function useActivitySocket(onMessage) {
         // onclose will fire next
       };
 
-      ws.onclose = () => {
+            ws.onclose = (event) => {
         setStatus("closed");
         if (closedByUsRef.current) return;
+
+        // Code 4001 = server rejected the token. Stop retrying —
+        // clear the stale token and redirect to login.
+        if (event.code === 4001) {
+          localStorage.removeItem("sentinelx_access_token");
+          localStorage.removeItem("sentinelx_refresh_token");
+          if (window.location.pathname !== "/login") {
+            window.location.href = "/login";
+          }
+          return;
+        }
 
         // Exponential backoff: 1s, 2s, 4s, 8s, capped at 30s
         retryRef.current += 1;

@@ -1,23 +1,13 @@
-/**
- * Minimal toast notification system.
- *
- * Usage:
- *   const toast = useToast();
- *   toast.push({ title: "New incident", body: "...", severity: "CRITICAL" });
- *
- * Render <ToastHost /> once at the app root.
- */
-
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 const ToastContext = createContext(null);
 let nextId = 1;
 
 const SEVERITY_STYLES = {
-  CRITICAL: { border: "#ef4444", glow: "rgba(239, 68, 68, 0.4)" },
-  HIGH: { border: "#f97316", glow: "rgba(249, 115, 22, 0.4)" },
-  MEDIUM: { border: "#eab308", glow: "rgba(234, 179, 8, 0.35)" },
-  LOW: { border: "#22c55e", glow: "rgba(34, 197, 94, 0.35)" },
+  CRITICAL: { border: "border-l-red-500", glow: "shadow-[0_8px_32px_rgba(239,68,68,0.4)]", dot: "text-red-500" },
+  HIGH: { border: "border-l-orange-500", glow: "shadow-[0_8px_32px_rgba(249,115,22,0.4)]", dot: "text-orange-500" },
+  MEDIUM: { border: "border-l-yellow-500", glow: "shadow-[0_8px_32px_rgba(234,179,8,0.35)]", dot: "text-yellow-500" },
+  LOW: { border: "border-l-green-500", glow: "shadow-[0_8px_32px_rgba(34,197,94,0.35)]", dot: "text-green-500" },
 };
 
 export function ToastProvider({ children }) {
@@ -51,7 +41,6 @@ export function ToastProvider({ children }) {
     [dismiss]
   );
 
-  // Clean up any pending timers on unmount
   useEffect(() => {
     return () => {
       Object.values(timeoutsRef.current).forEach(clearTimeout);
@@ -75,30 +64,32 @@ export function ToastHost() {
   const { toasts, dismiss } = useToast();
 
   return (
-    <div style={styles.host}>
+    <div className="fixed top-4 right-4 flex flex-col gap-2 z-[9999] max-w-sm">
       {toasts.map((t) => {
         const s = SEVERITY_STYLES[t.severity] || SEVERITY_STYLES.MEDIUM;
         return (
           <div
             key={t.id}
-            style={{
-              ...styles.toast,
-              borderLeft: `4px solid ${s.border}`,
-              boxShadow: `0 8px 32px ${s.glow}`,
-              cursor: t.onClick ? "pointer" : "default",
-            }}
             onClick={() => {
               if (t.onClick) t.onClick();
               dismiss(t.id);
             }}
+            className={`
+              bg-white dark:bg-slate-900/95
+              text-slate-900 dark:text-slate-200
+              px-4 py-3 rounded-lg backdrop-blur-md
+              border-l-4 ${s.border} ${s.glow}
+              animate-slide-in
+              ${t.onClick ? "cursor-pointer" : "cursor-default"}
+            `}
           >
-            <div style={styles.row}>
-              <div style={styles.title}>
-                <span style={{ color: s.border, marginRight: 8 }}>?</span>
+            <div className="flex justify-between items-start gap-2">
+              <div className="text-sm font-bold tracking-wide">
+                <span className={`${s.dot} mr-2`}>?</span>
                 {t.title}
               </div>
               <button
-                style={styles.close}
+                className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 text-xl leading-none"
                 onClick={(e) => {
                   e.stopPropagation();
                   dismiss(t.id);
@@ -107,59 +98,14 @@ export function ToastHost() {
                 ?
               </button>
             </div>
-            {t.body && <div style={styles.body}>{t.body}</div>}
+            {t.body && (
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                {t.body}
+              </div>
+            )}
           </div>
         );
       })}
     </div>
   );
 }
-
-const styles = {
-  host: {
-    position: "fixed",
-    top: "1rem",
-    right: "1rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.5rem",
-    zIndex: 9999,
-    maxWidth: 380,
-  },
-  toast: {
-    background: "rgba(15, 23, 42, 0.95)",
-    color: "#e2e8f0",
-    padding: "0.75rem 1rem",
-    borderRadius: "8px",
-    backdropFilter: "blur(12px)",
-    fontFamily:
-      "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
-    animation: "sx-slide-in 0.25s ease-out",
-  },
-  row: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: "0.5rem",
-  },
-  title: {
-    fontSize: "0.88rem",
-    fontWeight: 700,
-    letterSpacing: "0.02em",
-  },
-  close: {
-    background: "transparent",
-    border: "none",
-    color: "#64748b",
-    fontSize: "1.2rem",
-    lineHeight: 1,
-    cursor: "pointer",
-    padding: 0,
-  },
-  body: {
-    fontSize: "0.78rem",
-    color: "#94a3b8",
-    marginTop: "0.35rem",
-    lineHeight: 1.4,
-  },
-};
