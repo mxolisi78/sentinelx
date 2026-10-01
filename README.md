@@ -6,6 +6,17 @@ incidents end-to-end.
 
 ![CI](https://github.com/mxolisi78/sentinelx/actions/workflows/ci.yml/badge.svg)
 
+
+## Live Demo
+
+- **Frontend**: https://sentinelx-frontend-r3ck.onrender.com
+- **Backend API**: https://sentinelx-backend-8o58.onrender.com
+
+**Demo login:** `admin` / `SentinelX2025!`
+
+> The backend is on Render's free tier and spins down after 15 minutes
+> of inactivity. The first request after idle may take up to 60 seconds.
+
 ## Features
 
 - **JWT authentication** with three roles (Admin / Analyst / Viewer)
