@@ -197,7 +197,7 @@ export default function Incidents() {
                     <Td><span style={styles.titleText}>{i.title}</span></Td>
                     <Td>{i.event_count}</Td>
                     <Td>{i.detection_count}</Td>
-                    <Td>{i.assigned_to_detail?.username || "—"}</Td>
+                    <Td>{i.assigned_to_detail?.username || "???"}</Td>
                     <Td mono>{formatTime(i.created_at)}</Td>
                   </tr>
                 ))}
@@ -217,7 +217,7 @@ export default function Incidents() {
           <section style={styles.detail}>
             <div style={styles.detailHeader}>
               <h3 style={styles.detailTitle}>{selected.title}</h3>
-              <button style={styles.closeBtn} onClick={() => setSelectedId(null)}>×</button>
+              <button style={styles.closeBtn} onClick={() => setSelectedId(null)}>??</button>
             </div>
 
             <div style={styles.detailMeta}>
@@ -310,7 +310,7 @@ function Td({ children, mono }) {
 }
 
 function formatTime(iso) {
-  if (!iso) return "—";
+  if (!iso) return "???";
   return new Date(iso).toLocaleString();
 }
 
