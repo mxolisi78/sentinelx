@@ -121,6 +121,13 @@ def create_incidents_from_detections(detections=None) -> int:
         except Exception as exc:
             print(f"[playbooks] Failed on incident #{incident.id}: {exc}")
 
+                # Auto-notify configured channels (if any)
+        try:
+            from notifications.service import auto_notify
+            auto_notify(incident)
+        except Exception as exc:
+            print(f"[notify] Failed on incident #{incident.id}: {exc}")    
+
         created_count += 1
 
     return created_count

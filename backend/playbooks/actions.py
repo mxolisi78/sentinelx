@@ -89,11 +89,34 @@ def _handle_create_event(incident, value):
 
 
 def _handle_notify(incident, value):
-    """Deferred to Feature C ? for now, just log it."""
+    """
+    Send a notification about this incident to configured channels.
+
+    value can be:
+      - a string → sent as the body of the alert (uses default title)
+      - a dict with {"title": "...", "body": "...", "channels": ["name1"]}
+    """
+    from notifications.models import NotificationChannel
+    from notifications.service import notify_incident
+
+    channel_names = None
+    body = None
+    title = None
+
+    if isinstance(value, dict):
+        body = value.get("body")
+        title = value.get("title")
+        channel_names = value.get("channels")
+
+    channels = None
+    if channel_names:
+        channels = list(NotificationChannel.objects.filter(name__in=channel_names, enabled=True))
+
+    sent = notify_incident(incident, channels=channels)
     return {
         "action": "NOTIFY",
         "value": value,
-        "result": "queued (notification engine not yet wired)",
+        "result": f"sent to {sent} channel(s)",
     }
 
 
