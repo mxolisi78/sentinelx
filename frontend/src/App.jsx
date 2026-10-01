@@ -9,6 +9,7 @@ import Incidents from "./pages/Incidents";
 import ThreatIntel from "./pages/ThreatIntel";
 import Analytics from "./pages/Analytics";
 import Playbooks from "./pages/Playbooks";
+import Settings from "./pages/Settings";
 
 export default function App() {
   return (
@@ -55,6 +56,14 @@ export default function App() {
   element={
     <ProtectedRoute>
       <Playbooks />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/settings"
+  element={
+    <ProtectedRoute>
+      <Settings />
     </ProtectedRoute>
   }
 />

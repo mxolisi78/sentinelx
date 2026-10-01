@@ -96,6 +96,7 @@ export default function Analytics() {
   <NavLink to="/incidents">Incidents</NavLink>
   <NavLink to="/threat-intel">Threat Intel</NavLink>
   <NavLink to="/playbooks">Playbooks</NavLink>
+  <NavLink to="/settings">Settings</NavLink>
 </nav>
 
         <div className="flex items-center gap-3">

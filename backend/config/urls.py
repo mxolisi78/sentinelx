@@ -33,4 +33,5 @@ urlpatterns = [
     path("api/", include("events.urls")),
     path("api/", include("analytics.urls")),
     path("api/", include("playbooks.urls")),
+    path("api/", include("notifications.urls")),
 ]
