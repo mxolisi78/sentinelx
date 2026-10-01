@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Incidents from "./pages/Incidents";
 import ThreatIntel from "./pages/ThreatIntel";
 import Analytics from "./pages/Analytics";
+import Playbooks from "./pages/Playbooks";
 
 export default function App() {
   return (
@@ -46,6 +47,14 @@ export default function App() {
   element={
     <ProtectedRoute>
       <Analytics />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/playbooks"
+  element={
+    <ProtectedRoute>
+      <Playbooks />
     </ProtectedRoute>
   }
 />

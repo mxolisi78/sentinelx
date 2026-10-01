@@ -32,4 +32,5 @@ urlpatterns = [
     path("api/", include("threatintel.urls")),
     path("api/", include("events.urls")),
     path("api/", include("analytics.urls")),
+    path("api/", include("playbooks.urls")),
 ]

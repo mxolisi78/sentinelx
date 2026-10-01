@@ -85,11 +85,12 @@ export default function ThreatIntel() {
         </div>
 
         <nav className="flex gap-1">
-          <NavLink to="/dashboard">Dashboard</NavLink>
-          <NavLink to="/incidents">Incidents</NavLink>
-          <NavLink to="/threat-intel" active>Threat Intel</NavLink>
-          <NavLink to="/analytics">Analytics</NavLink>
-        </nav>
+  <NavLink to="/dashboard">Dashboard</NavLink>
+  <NavLink to="/analytics">Analytics</NavLink>
+  <NavLink to="/incidents">Incidents</NavLink>
+  <NavLink to="/threat-intel">Threat Intel</NavLink>
+  <NavLink to="/playbooks">Playbooks</NavLink>
+</nav>
 
         <div className="flex items-center gap-3">
           <ThemeToggle />
