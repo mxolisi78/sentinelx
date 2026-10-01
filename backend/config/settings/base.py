@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "ml",
     "threatintel",
      "analytics",
+     "playbooks",
 ]
 
 

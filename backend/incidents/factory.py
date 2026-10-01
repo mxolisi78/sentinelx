@@ -114,6 +114,13 @@ def create_incidents_from_detections(detections=None) -> int:
 
         _broadcast_incident(incident)
 
+        # Run response playbooks (never let this break incident creation)
+        try:
+            from playbooks.engine import run_playbooks_for_incident
+            run_playbooks_for_incident(incident)
+        except Exception as exc:
+            print(f"[playbooks] Failed on incident #{incident.id}: {exc}")
+
         created_count += 1
 
     return created_count
